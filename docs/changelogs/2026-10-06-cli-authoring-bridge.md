@@ -1,4 +1,17 @@
-# Calliope 1.6 — CLI authoring bridge (`calliope-cli`)
+# Calliope 1.6.0 — CLI authoring bridge (`calliope-cli`)
+
+Release **v1.6.0**, 2026-10-16. Together with [H3 latent continuation](./2026-10-16-h3-latent-continuation.md). Includes merged [PR #92](https://github.com/benjiyaya/Calliope/pull/92) by @happymy (merge `0a75919`).
+
+`calliope-cli` is a second way to write a project's text. A coding agent such as OpenCode or Cursor can store a full novel and write the beats, cast, screenplay, shot clips, and continuity requirements. The web UI still generates images and video, and it is still the only way to delete a project.
+
+- `calliope-cli.bat` at the repo root. It is not on PATH. It writes the same database as the running app.
+- Finished text only. It never calls the in-app LLM, and it never writes image or video files.
+- `--expect-hash` refuses a write when that table changed since the last read (exit 3). Re-read and write again.
+- A story idea longer than 2,000 characters makes **Draft storyline** and **Regenerate Script** return 422. A project marked externally authored hides those two buttons. **Break into shots** stays.
+- The project list sends a 200-character idea preview instead of every novel.
+- Agent instructions: `calliope-backend/skills_opencode/calliope/SKILL.md`. How to point OpenCode or Cursor at it: [CLI with a coding agent](https://github.com/benjiyaya/Calliope/wiki/CLI-with-a-coding-agent).
+
+## Design record
 
 A second way to write a project's *content*. Until now the web UI was the only
 door in, which meant a 34k-character novel could only become beats by pasting
@@ -163,4 +176,6 @@ characters and reported success. It overrides now.
 Idempotent schema migration: two columns on `projects`
 (`project_revision`, `ingest_mode`) and a new `cli_audit` table, all added with
 `ADD COLUMN`-style guards. No existing column changes type or default, so old
-databases migrate without a rebuild. `git pull`; the frontend is unchanged.
+databases migrate without a rebuild. `git pull`, then restart the backend. The
+web UI hides **Draft storyline** and **Regenerate Script** on an externally
+authored project, and the new-project form counts story-idea characters.
